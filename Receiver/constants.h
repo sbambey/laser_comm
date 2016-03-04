@@ -1,6 +1,7 @@
-#define PHOTO_DIODE A0
+#define PHOTO_DIODE 7
 
 typedef struct Node {
   int reading;
+  unsigned long timing;
   Node *next;
 } Node;

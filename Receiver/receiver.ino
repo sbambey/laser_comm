@@ -1,31 +1,58 @@
 #include "constants.h"
+#include "digitalWriteFast.h"
 
-long start;
-long finish;
+unsigned long last_time;
+unsigned long current_time;
 
-int readings[8];
+int last_state = 0;
+int state = 0;
+
+Node *root;
+Node *current;
+
+void free_list() {
+  Node *node = root;
+  while(node) {
+    Node *temp = node;
+    node = temp->next;
+    free(temp);
+  }
+  root = 0;
+}
 
 void setup() {
-  //pinMode(PHOTO_DIODE, INPUT);
+  Serial.begin(9600);
+  DDRB = B00000000;
 }
 
 void loop() {
-  //Serial.println(analogRead(PHOTO_DIODE));
-  for(int i=0; i<8; i++) {
-    while(analogRead(PHOTO_DIODE) < 454);
-    start = micros();
-    while(analogRead(PHOTO_DIODE) >= 454) {
-      delayMicroseconds(1);
-    }
-    readings[i] = micros()-start;
-    //delay(2000);
-    //readings[i] = analogRead(PHOTO_DIODE);
+
+  if(!root) {
+    root = (Node *)malloc(sizeof(Node));
+    root->next = 0;
+    current = root;
+    current->reading = ~(PINB & B1);
   }
-  Serial.begin(9600);
-  for(int i=0; i<8; i++) {
-    Serial.println(readings[i]);
+  
+  last_time=micros();
+  
+  for(int i=0; i<100; i++) {
+    while((~PINB & B00000001) == current->reading);
+    current->next = (Node *)malloc(sizeof(Node));
+    current = current->next;
+    current->next = 0;
+    current->reading = (~PINB & B00000001);
+    current_time = micros();
+    current->timing = current_time-last_time;
+    last_time = current_time;
   }
-  Serial.println("---------------");
-  Serial.end();
-  delay(5000);
+
+  current = root;
+  while(current->next != 0) {
+    Serial.println(current->timing);
+    current = current->next;
+  }
+  Serial.println("-----------");
+
+  free_list();
 }
