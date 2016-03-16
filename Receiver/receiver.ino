@@ -41,12 +41,15 @@ void loop() {
 
   /*Serial.print("Logic: ");
   Serial.println(PINB & B00000001);*/
-  Serial.println("ready");
+
   while((PINB & B00000001) != 1);
 
+  //Serial.println("Now");
   last_timestamp = micros();
 
   while((PINB & B00000001) == 1);
+
+  //Serial.println(micros()-last_timestamp);
 
   if(micros()-last_timestamp > 200000) {
     
@@ -54,26 +57,34 @@ void loop() {
     current = root;
     
     current->reading = (PINB & B00000001);
+
+    //Serial.println(current->reading);
     current->timestamp = micros();
     current->next = 0;
 
     last_timestamp = current->timestamp;
 
     while(true) {
-      while((PINB & B00000001) == current->reading);
+      while((PINB & B00000001) == current->reading) {
+        if(micros()-current->timestamp > 50000) break;
+      }
       current->next = (Node *)malloc(sizeof(Node));
       current = current->next;
       current->reading = (PINB & B00000001);
       current->timestamp = micros();
       current->next = 0;
-
-      if(current->timestamp-last_timestamp > 500000) break;
+      //Serial.println(current->timestamp-last_timestamp);
+      Serial.println(current->reading);
+      if(current->timestamp-last_timestamp > 50000) break;
 
       last_timestamp = current->timestamp;
     }
     
     current = root;
     last_timestamp = current->timestamp;
+
+    bit_string += String(current->reading);
+    
     while(current->next != 0) {
       current = current->next;
       //Serial.println(current->reading);
@@ -91,13 +102,14 @@ void loop() {
       }
       last_timestamp = current->timestamp;
     }
+    //Serial.println();
     Serial.print("Bit String: ");Serial.println(bit_string);
     bit_string="";
     last_timestamp = 0;
     
-  
+    Serial.println("-----------");
     free_list();
-  Serial.println("-----------");
+  
     //delay(20000);
   }
 }

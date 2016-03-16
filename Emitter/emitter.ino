@@ -9,7 +9,7 @@ void cycle(long period) {
   delayMicroseconds(period);
 }
 
-void delayMicrosecondss()
+void delayCycle()
 {
         // calling avrlib's delay_us() function with low values (e.g. 1 or
         // 2 microseconds) gives delays longer than desired.
@@ -24,7 +24,7 @@ void delayMicrosecondss()
         // the following loop takes a quarter of a microsecond (4 cycles)
         // per iteration, so execute it four times for each microsecond of
         // delay requested.
-        unsigned int us = 2000;
+        unsigned int us = CYCLE;
         us <<= 2;
 
         // account for the time taken in the preceeding commands.
@@ -50,9 +50,20 @@ void setup() {
 }
 
 void loop() {
+
+  for(int i=0; i<8;i++) {
+    PORTB |= _BV(0);
+    delayCycle();
+  }
+
+  for(int i=0; i<8;i++) {
+    PORTB &= ~(_BV(0));
+    delayCycle();
+  }
+  
   /* ON */
-  PORTB |= _BV(0);
-  delay(500);
+  /*PORTB |= _BV(0);
+  delay(500);*/
   //synchronize(LASER_VCC, 200);
   for(int i=0; i<20; i++) {
     PORTB &= ~(_BV(0));
