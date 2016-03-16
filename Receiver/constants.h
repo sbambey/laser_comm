@@ -2,6 +2,6 @@
 
 typedef struct Node {
   int reading;
-  unsigned long timing;
+  unsigned long timestamp;
   Node *next;
 } Node;

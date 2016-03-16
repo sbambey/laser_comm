@@ -37,9 +37,6 @@ void delayMicrosecondss()
         );
 }
 
-/*
- * Sync signature LOW-HIGH-LOW-HIGH
- */
 void synchronize(int pin, long comm_period) {
   digitalWrite(pin, HIGH);
   delay(SYNC_DELAY);
@@ -53,9 +50,18 @@ void setup() {
 }
 
 void loop() {
-  //synchronize(LASER_VCC, 200);
+  /* ON */
   PORTB |= _BV(0);
-  delayMicrosecondss();
+  delay(500);
+  //synchronize(LASER_VCC, 200);
+  for(int i=0; i<20; i++) {
+    PORTB &= ~(_BV(0));
+    delayMicrosecondss();
+    PORTB |= _BV(0);
+    delayMicrosecondss();
+  }
+
   PORTB &= ~(_BV(0));
-  delayMicrosecondss();
+
+  delay(3000);
 }
