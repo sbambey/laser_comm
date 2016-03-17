@@ -51,28 +51,50 @@ void setup() {
 
 void loop() {
 
-  for(int i=0; i<8;i++) {
-    PORTB |= _BV(0);
-    delayCycle();
-  }
+  /* Send beginning of transmission signature */
 
-  for(int i=0; i<8;i++) {
+  /* Signature: 11000101 */
+
+  PORTB |= _BV(0);
+  delayCycle();
+
+  PORTB |= _BV(0);
+  delayCycle();
+
+  PORTB &= ~(_BV(0));
+  delayCycle();
+
+  PORTB &= ~(_BV(0));
+  delayCycle();
+
+  PORTB &= ~(_BV(0));
+  delayCycle();
+  
+  PORTB |= _BV(0);
+  delayCycle();
+
+  PORTB &= ~(_BV(0));
+  delayCycle();
+
+  PORTB |= _BV(0);
+  delayCycle();
+
+  /*for(int i=0; i<5; i++) {
     PORTB &= ~(_BV(0));
     delayCycle();
-  }
+    PORTB |= _BV(0);
+    delayCycle();
+  }*/
+  delay(5000);
   
   /* ON */
   /*PORTB |= _BV(0);
   delay(500);*/
   //synchronize(LASER_VCC, 200);
-  for(int i=0; i<20; i++) {
+  /*for(int i=0; i<20; i++) {
     PORTB &= ~(_BV(0));
-    delayMicrosecondss();
+    delayCycle();
     PORTB |= _BV(0);
-    delayMicrosecondss();
-  }
-
-  PORTB &= ~(_BV(0));
-
-  delay(3000);
+    delayCycle();
+  }*/
 }
