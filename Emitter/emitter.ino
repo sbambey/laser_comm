@@ -2,11 +2,27 @@
 
 #define _BV(bit) (1 << (bit))
 
+String character = "Hello Simon";
+
 void cycle(long period) {
   digitalWrite(LASER_VCC, LOW);
   delayMicroseconds(period);
   digitalWrite(LASER_VCC, HIGH);
   delayMicroseconds(period);
+}
+
+String charactersToBinary(String str){
+    String zero = "0";
+    String binaryNumber = "";
+    String tmp ="";
+    for(int i= 0; i < str.length(); i++){
+      tmp = (String(str.charAt(i), BIN));
+      for(; tmp.length()<8;){
+        tmp = zero + tmp;
+      }
+      binaryNumber = binaryNumber + tmp;
+    }
+    return binaryNumber;
 }
 
 void delayCycle()
@@ -53,6 +69,8 @@ void loop() {
 
   /* Send beginning of transmission signature */
 
+  String charTest = charactersToBinary(character);
+  
   /* Signature: 11000101 */
 
   PORTB |= _BV(0);
@@ -77,6 +95,49 @@ void loop() {
   delayCycle();
 
   PORTB |= _BV(0);
+  delayCycle();
+
+
+  /***************/
+
+  for(int i=0; i<88; i++) {
+    if(charTest.charAt(i) == '1') {
+      PORTB |= _BV(0);
+      delayCycle();
+    }
+    else {
+      PORTB &= ~(_BV(0));
+      delayCycle();
+    }
+  }
+
+  PORTB |= _BV(0);
+  delayCycle();
+
+  PORTB |= _BV(0);
+  delayCycle();
+
+  PORTB &= ~(_BV(0));
+  delayCycle();
+
+  PORTB &= ~(_BV(0));
+  delayCycle();
+
+  PORTB &= ~(_BV(0));
+  delayCycle();
+  
+  PORTB |= _BV(0);
+  delayCycle();
+
+  PORTB &= ~(_BV(0));
+  delayCycle();
+
+  PORTB |= _BV(0);
+  delayCycle();
+
+  /**********/
+
+  PORTB &= ~(_BV(0));
   delayCycle();
 
   /*for(int i=0; i<5; i++) {

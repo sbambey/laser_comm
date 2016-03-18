@@ -2,6 +2,6 @@
 
 #define SYNC_DELAY 500
 
-#define CYCLE 16000
+#define CYCLE 200
 
 
