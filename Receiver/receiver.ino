@@ -1,14 +1,14 @@
 #include "constants.h"
+#include "Arduino.h"
+#include "send.h"
 
 unsigned long last_timestamp;
-unsigned long last_timestamp1;
 unsigned long current_timestamp;
 
 byte current_signal;
 byte received = 0;
 int shift_counter = 0;
 
-String bit_string = "";
 String rec = "";
 boolean active = 0;
 
@@ -29,65 +29,80 @@ void free_list() {
 void setup() {
   Serial.begin(9600);
   DDRB = B00000000;
+
+  DDRL = B11111111;
+
+  last_timestamp = micros();
 }
 
 void loop() {
-  
-  last_timestamp = micros();
 
-  while(true) {
-    while((PINB & B00000001) == current_signal);
-    int multiplier;
-    
-    current_timestamp = micros();
-    
-    if(current_signal == 1) {
-      //Serial.print("1: ");Serial.println(current_timestamp-last_timestamp);
-      multiplier = ((current_timestamp-last_timestamp-48)/200);
-    }
-    else {
-      //Serial.print("0: ");Serial.println(current_timestamp-last_timestamp);
-      multiplier = ((current_timestamp-last_timestamp+48)/200);
-    }
-    //Serial.println(multiplier);
-    //Serial.println(current_signal);
-    if(multiplier < 9) {
-      for(int i=0; i<multiplier; i++) {
-        received = received << 1;
-        received |= current_signal;
-        
-        shift_counter++;
+  while((PINB & B00000001) == current_signal) {
+    if(Serial.available() > 0) {
+      String transfer_binary = charactersToBinary(Serial.readString());
 
-        //Serial.println(shift_counter);
-        
-        if(!active && received == B11000101) {
-          active = 1;
-          shift_counter = 0;
-          //Serial.println("Message start");
+      for(int i=0; i<88; i++) {
+        if(charTest.charAt(i) == '1') {
+          PORTB |= _BV(0);
+          delayCycle();
         }
-        
-        if(shift_counter == 8) {
-          //Serial.println(received);
-          if(active && received == B11000101) {
-            active = 0;
-            //Serial.println("Message end");
-            Serial.println(rec);
-            rec = "";
-            delay(1000);
-          }
-          else if(active) {
-            rec += String((char)received);
-          }
-          shift_counter = 0;
+        else {
+          PORTB &= ~(_BV(0));
+          delayCycle();
         }
       }
     }
-    
-    current_signal = (PINB & B00000001);
-    last_timestamp = current_timestamp;    
   }
-
+  int multiplier;
   
+  current_timestamp = micros();
+  
+  if(current_signal == 1) {
+    //Serial.print("1: ");Serial.println(current_timestamp-last_timestamp);
+    multiplier = ((current_timestamp-last_timestamp-CORRECTION_OFFSET)/200);
+  }
+  else {
+    //Serial.print("0: ");Serial.println(current_timestamp-last_timestamp);
+    multiplier = ((current_timestamp-last_timestamp+CORRECTION_OFFSET)/200);
+  }
+  //Serial.println(multiplier);
+  //Serial.println(current_signal);
+  if(multiplier < 9) {
+    for(int i=0; i<multiplier; i++) {
+      received = received << 1;
+      received |= current_signal;
+      
+      shift_counter++;
+
+      //Serial.println(shift_counter);
+      
+      if(!active && received == B11000101) {
+        active = 1;
+        shift_counter = 0;
+        //Serial.println("Message start");
+      }
+      
+      if(shift_counter == 8) {
+        //Serial.println(received);
+        if(active && received == B11000101) {
+          active = 0;
+          //Serial.println("Message end");
+          Serial.println(rec);
+          rec = "";
+          delay(1000);
+        }
+        else if(active) {
+          rec += String((char)received);
+        }
+        shift_counter = 0;
+      }
+    }
+  }
+  
+  current_signal = (PINB & B00000001);
+  last_timestamp = current_timestamp;    
+
+
 
   
   /*root = (Node *)malloc(sizeof(Node));
