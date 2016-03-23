@@ -2,7 +2,8 @@
 
 #define _BV(bit) (1 << (bit))
 
-String character = "Hello Simon";
+String character = "This is a really long string so that we can test this god damn software. Yep i'm still typing because it's not long enough. Just one more sentence is all he says, but i'm not done yet! AHA! This is the last one!";
+char characters[400];
 
 void cycle(long period) {
   digitalWrite(LASER_VCC, LOW);
@@ -63,6 +64,7 @@ void synchronize(int pin, long comm_period) {
 void setup() {
   DDRB = B11111111;
   //synchronize(LASER_VCC, 200);
+  //Serial.begin(9600);
 }
 
 void loop() {
@@ -100,14 +102,19 @@ void loop() {
 
   /***************/
 
-  for(int i=0; i<88; i++) {
-    if(charTest.charAt(i) == '1') {
-      PORTB |= _BV(0);
-      delayCycle();
-    }
-    else {
-      PORTB &= ~(_BV(0));
-      delayCycle();
+  character.toCharArray(characters,400);
+
+  for(int i=0; i<character.length(); i++) {
+    String binary_char = charactersToBinary(String(characters[i]));
+    for(int j=0; j<8;j++) {
+      if(binary_char.charAt(j) == '1') {
+        PORTB |= _BV(0);
+        delayCycle();
+      }
+      else {
+        PORTB &= ~(_BV(0));
+        delayCycle();
+      }
     }
   }
 
