@@ -1,4 +1,6 @@
 #include "constants.h"
+#include "Arduino.h"
+#include "send.h"
 
 unsigned long last_timestamp;
 unsigned long current_timestamp;
@@ -57,6 +59,7 @@ void loop() {
       }
     }
   }
+  
   int multiplier;
   
   current_timestamp = micros();
