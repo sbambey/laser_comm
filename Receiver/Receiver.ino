@@ -31,28 +31,28 @@ void free_list() {
 void send_signature() {
   /* Signature: 11000101 */
 
-  PORTB |= _BV(0);
+  PORTL |= _BV(0);
   delayCycle();
 
-  PORTB |= _BV(0);
+  PORTL |= _BV(0);
   delayCycle();
 
-  PORTB &= ~(_BV(0));
+  PORTL &= ~(_BV(0));
   delayCycle();
 
-  PORTB &= ~(_BV(0));
+  PORTL &= ~(_BV(0));
   delayCycle();
 
-  PORTB &= ~(_BV(0));
+  PORTL &= ~(_BV(0));
   delayCycle();
   
-  PORTB |= _BV(0);
+  PORTL |= _BV(0);
   delayCycle();
 
-  PORTB &= ~(_BV(0));
+  PORTL &= ~(_BV(0));
   delayCycle();
 
-  PORTB |= _BV(0);
+  PORTL |= _BV(0);
   delayCycle();
 }
 
@@ -94,7 +94,7 @@ void loop() {
 
       send_signature();
       
-      PORTB &= ~(_BV(0));
+      PORTL &= ~(_BV(0));
       delayCycle();
       
       transfer_string = "";
