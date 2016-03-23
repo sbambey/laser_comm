@@ -12,7 +12,7 @@ int shift_counter = 0;
 String rec = "";
 boolean active = 0;
 
-String character = "This is a really long string so that we can test this god damn software. Yep i'm still typing because it's not long enough. Just one more sentence is all he says, but i'm not done yet! AHA! This is the last one!";
+String transfer_string = "";
 char characters[400];
 
 Node *root;
@@ -32,6 +32,7 @@ void free_list() {
 void setup() {
   Serial.begin(9600);
   DDRB = B00000000;
+  DDRL = B11111111;
 
   last_timestamp = micros();
 }
@@ -39,24 +40,28 @@ void setup() {
 void loop() {
 
   while((PINB & B00000001) == current_signal) {
+    
     if(Serial.available() > 0) {
-      String transfer_string = Serial.readString();
+      transfer_string = Serial.readString();
+    }
 
+    if(transfer_string.length() > 0 && !active && shift_counter == 0) {
       transfer_string.toCharArray(characters,400);
-
+      
       for(int i=0; i<transfer_string.length(); i++) {
         String binary_char = charactersToBinary(String(characters[i]));
         for(int j=0; j<8;j++) {
           if(binary_char.charAt(j) == '1') {
-            PORTB |= _BV(0);
+            PORTL |= _BV(0);
             delayCycle();
           }
           else {
-            PORTB &= ~(_BV(0));
+            PORTL &= ~(_BV(0));
             delayCycle();
           }
         }
       }
+      transfer_string = "";
     }
   }
   
