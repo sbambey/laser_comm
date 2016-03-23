@@ -28,6 +28,34 @@ void free_list() {
   root = 0;
 }
 
+void send_signature() {
+  /* Signature: 11000101 */
+
+  PORTB |= _BV(0);
+  delayCycle();
+
+  PORTB |= _BV(0);
+  delayCycle();
+
+  PORTB &= ~(_BV(0));
+  delayCycle();
+
+  PORTB &= ~(_BV(0));
+  delayCycle();
+
+  PORTB &= ~(_BV(0));
+  delayCycle();
+  
+  PORTB |= _BV(0);
+  delayCycle();
+
+  PORTB &= ~(_BV(0));
+  delayCycle();
+
+  PORTB |= _BV(0);
+  delayCycle();
+}
+
 /* PIN 53 */
 void setup() {
   Serial.begin(9600);
@@ -47,6 +75,8 @@ void loop() {
 
     if(transfer_string.length() > 0 && !active && shift_counter == 0) {
       transfer_string.toCharArray(characters,400);
+
+      send_signature();
       
       for(int i=0; i<transfer_string.length(); i++) {
         String binary_char = charactersToBinary(String(characters[i]));
@@ -61,6 +91,12 @@ void loop() {
           }
         }
       }
+
+      send_signature();
+      
+      PORTB &= ~(_BV(0));
+      delayCycle();
+      
       transfer_string = "";
     }
   }
